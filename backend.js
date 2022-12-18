@@ -232,7 +232,245 @@ function arrivalTimeSim(interarrivalArr){
     return arrivalArr
 }
 
+//-----------------------------------RATE PARAMETER MODELS-----------------------------------
 
+//-------------------------------------M/M/1--------------------------------------------
+class M_M_1 {
+  constructor(lambda, mu) {
+    this.lambda = lambda;
+    this.mu = mu;
+    this.utilization = lambda / mu;
+  }
+  get_Utilization() {
+    return this.utilization;
+  }
+  number_of_customer_in_queue() {
+    return Math.pow(this.utilization, 2) / (1 - this.utilization);
+  }
+  wait_in_queue() {
+    return this.number_of_customer_in_queue() / this.lambda;
+  }
+  wait_in_system() {
+    return this.wait_in_queue() + 1 / this.mu;
+  }
+  number_of_customer_in_system() {
+    return this.lambda * this.wait_in_system();
+  }
+  proportion_of_idletime() {
+    return 1 - this.utilization;
+  }
+}
+//-------------------------------------M/G/1--------------------------------------------
+class M_G_1 {
+  constructor(lambda, mu, variance) {
+    this.lambda = lambda;
+    this.mu = mu;
+    this.variance = variance;
+    this.utilization = lambda / mu;
+  }
+
+  get_Utilization() {
+    return this.utilization;
+  }
+  number_of_customer_in_queue() {
+    return (
+      (Math.pow(this.lambda, 2) * Math.pow(this.variance, 2) +
+        Math.pow(this.utilization, 2)) /
+      (2 * (1 - this.utilization))
+    );
+  }
+  wait_in_queue() {
+    return this.number_of_customer_in_queue() / this.lambda;
+  }
+  wait_in_system() {
+    return this.wait_in_queue() + 1 / this.mu;
+  }
+  number_of_customer_in_system() {
+    return this.lambda * this.wait_in_system();
+  }
+  proportion_of_idletime() {
+    return 1 - this.utilization;
+  }
+}
+//-------------------------------------G/G/1--------------------------------------------
+class G_G_1 {
+  constructor(lambda, mu, varianceA, varianceS) {
+    this.lambda = lambda;
+    this.mu = mu;
+    this.varianceA = varianceA;
+    this.varianceS = varianceS;
+    this.utilization = lambda / mu;
+  }
+  cSquare(variance, mean) {
+    return variance / Math.pow(mean, 2);
+  }
+  get_Utilization() {
+    return this.utilization;
+  }
+  number_of_customer_in_queue() {
+    var utilizationSquare = Math.pow(this.utilization, 2);
+    var CaSquare = this.cSquare(this.varianceA, 1 / this.lambda);
+    var CsSquare = this.cSquare(this.varianceS, 1 / this.mu);
+    return (
+      (utilizationSquare *
+        (1 + CsSquare) *
+        (CaSquare + utilizationSquare * CsSquare)) /
+      (2 * (1 - this.utilization) * (1 + utilizationSquare * CsSquare))
+    );
+  }
+  wait_in_queue() {
+    return this.number_of_customer_in_queue() / this.lambda;
+  }
+  wait_in_system() {
+    return this.wait_in_queue() + 1 / this.mu;
+  }
+  number_of_customer_in_system() {
+    return this.lambda * this.wait_in_system();
+  }
+  proportion_of_idletime() {
+    return 1 - this.utilization;
+  }
+}
+//-------------------------------------M/M/C--------------------------------------------
+class M_M_C {
+  constructor(lambda, mu, varianceA, varianceS, C) {
+    this.lambda = lambda;
+    this.mu = mu;
+    this.varianceA = varianceA;
+    this.varianceS = varianceS;
+    this.C = C;
+    this.utilization = lambda / (mu * C);
+  }
+  cSquare(variance, mean) {
+    return variance / Math.pow(mean, 2);
+  }
+  factorial(num) {
+    if (num == 0 || num == 1) {
+      return 1;
+    }
+    var f = num;
+    while (num > 1) {
+      num--;
+      f *= num;
+    }
+    return f;
+  }
+  get_Utilization() {
+    return this.utilization;
+  }
+  number_of_customer_in_queue() {
+    var factor = 0;
+    for (let i = 0; i < this.C; i++) {
+      factor += Math.pow(this.C * this.utilization, i) / this.factorial(i);
+    }
+    factor +=
+      Math.pow(this.C * this.utilization, this.C) /
+      (this.factorial(this.C) * (1 - this.utilization));
+    var Po = 1 / factor;
+    return (
+      (Po * Math.pow(this.lambda / this.mu, this.C) * this.utilization) /
+      (this.factorial(this.C) * Math.pow(1 - this.utilization, 2))
+    );
+  }
+  wait_in_queue() {
+    return this.number_of_customer_in_queue() / this.lambda;
+  }
+  wait_in_system() {
+    return this.wait_in_queue() + 1 / this.mu;
+  }
+  number_of_customer_in_system() {
+    return this.lambda * this.wait_in_system();
+  }
+  proportion_of_idletime() {
+    return 1 - this.utilization;
+  }
+}
+//-------------------------------------G/G/C--------------------------------------------
+class G_G_C {
+  constructor(lambda, mu, varianceA, varianceS, C) {
+    this.lambda = lambda;
+    this.mu = mu;
+    this.varianceA = varianceA;
+    this.varianceS = varianceS;
+    this.C = C;
+    this.utilization = lambda / (mu * C);
+  }
+  cSquare(variance, mean) {
+    return variance / Math.pow(mean, 2);
+  }
+  get_Utilization() {
+    return this.utilization;
+  }
+  number_of_customer_in_queue() {
+    return this.wait_in_queue() * this.lambda;
+  }
+  wait_in_queue() {
+    var CaSquare = this.cSquare(this.varianceA, 1 / this.lambda);
+    var CsSquare = this.cSquare(this.varianceS, 1 / this.mu);
+    var mmcWq = new M_M_C(
+      this.lambda,
+      this.mu,
+      this.varianceA,
+      this.varianceS,
+      this.C
+    );
+    return mmcWq.wait_in_queue() * ((CaSquare + CsSquare) / 2);
+  }
+  wait_in_system() {
+    return this.wait_in_queue() + 1 / this.mu;
+  }
+  number_of_customer_in_system() {
+    return this.lambda * this.wait_in_system();
+  }
+  proportion_of_idletime() {
+    return 1 - this.utilization;
+  }
+}
+
+function variance(max, min) {
+  return ((max - min) ^ 2) / 12;
+}
+
+// var obj = new M_M_1(0.1, 0.125);
+// var obj = new M_G_1(0.1, 0.125, variance(9, 7));
+// var obj = new G_G_1(0.1, 0.125, 20, 25);
+// var obj = new M_M_C(0.1, 0.0667, 100, 8.333, 2);
+var obj = new G_G_C(0.1, 0.0667, 100, 8.333, 2);
+console.log("utilization: " + obj.get_Utilization());
+console.log("proportion_of_idletime: " + obj.proportion_of_idletime());
+console.log(
+  "number_of_customer_in_system: " + obj.number_of_customer_in_system()
+);
+console.log("wait_in_system: " + obj.wait_in_system());
+console.log("wait_in_queue: " + obj.wait_in_queue());
+console.log(
+  "number_of_customer_in_queue: " + obj.number_of_customer_in_queue()
+);
+
+//----------------------------------EXCEL FILE LOAD-----------------------------------------------
+function handleFile(e) {
+  var file = e.target.files[0];
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var data = e.target.result;
+    /* reader.readAsArrayBuffer(file) -> data will be an ArrayBuffer */
+    var workbook = XLSX.read(e.target.result);
+
+    /* DO SOMETHING WITH workbook HERE */
+    var Sheet = workbook.SheetNames[0];
+    var excelRows = XLSX.utils.sheet_to_row_object_array(
+      workbook.Sheets[Sheet]
+    );
+      // this line print arrival and sertime array 
+    console.log(excelRows);
+  };
+  reader.readAsArrayBuffer(file);
+}
+// input_dom_element is a html input element of type file
+var input_dom_element = document.getElementById("input_dom_element");
+input_dom_element.addEventListener("change", handleFile, false);
+//link to add in html file
+// <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.19.1/package/dist/xlsx.full.min.js"></script>
 
 
 
