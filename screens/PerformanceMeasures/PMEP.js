@@ -7,10 +7,14 @@ import Header from "../../components/Header/Header";
 const PMEP = (props) => {
   const [lambda, setLambda] = useState(0);
   const [mu, setMu] = useState(0);
+  const [sigmaST, setSigmaST] = useState(0);
+  const [sigmaIA, setSigmaIA] = useState(0);
+  const [servers, setServers] = useState(0);
+
   const queueModel = props.route.params;
 
   const handleSubmit = () => {
-    console.log(lambda, mu, queueModel);
+    console.log(lambda, mu, queueModel, sigmaIA, sigmaST, servers);
   };
   return (
     <ScrollView style={styles.container}>
@@ -39,11 +43,11 @@ const PMEP = (props) => {
               </View>
             </>
           ) : (
-            queueModel === "mmc" ? (
+            queueModel === "mg1" ? (
                 <>
               <View style={styles.input}>
                 <Text style={styles.head}>
-                  Lambda (λ) or Avg Number of Arrivals
+                  Lambda (λ) or Avg Inter Arrival
                 </Text>
                 <InputField
                   label={""}
@@ -52,15 +56,127 @@ const PMEP = (props) => {
                 />
               </View>
               <View style={styles.input}>
-                <Text style={styles.head}>Mu (µ) or Avg Service Time</Text>
+                <Text style={styles.head}>Mu (µ) or Mean of Service Time</Text>
                 <InputField
                   label={""}
                   keyboardType={"numeric"}
                   onChangeText={(text) => setMu(text)}
                 />
               </View>
+              <View style={styles.input}>
+                <Text style={styles.head}>Sigma (σ2) or Variance of Service Time</Text>
+                <InputField
+                  label={""}
+                  keyboardType={"numeric"}
+                  onChangeText={(text) => setSigmaST(text)}
+                />
+              </View>
             </>
-            ) : null
+            ) : queueModel === "gg1" ? (
+                <>
+              <View style={styles.input}>
+                <Text style={styles.head}>
+                  Lambda (λ) or Mean of Inter Arrival
+                </Text>
+                <InputField
+                  label={""}
+                  keyboardType={"numeric"}
+                  onChangeText={(text) => setLambda(text)}
+                />
+              </View>
+              <View style={styles.input}>
+                <Text style={styles.head}>Mu (µ) or Mean of Service Time</Text>
+                <InputField
+                  label={""}
+                  keyboardType={"numeric"}
+                  onChangeText={(text) => setMu(text)}
+                />
+              </View>
+              <View style={styles.input}>
+                <Text style={styles.head}>Sigma (σ2) or Variance of Inter Arrival</Text>
+                <InputField
+                  label={""}
+                  keyboardType={"numeric"}
+                  onChangeText={(text) => setSigmaIA(text)}
+                />
+              </View>
+              <View style={styles.input}>
+                <Text style={styles.head}>Sigma (σ2) or Variance of Service Time</Text>
+                <InputField
+                  label={""}
+                  keyboardType={"numeric"}
+                  onChangeText={(text) => setSigmaST(text)}
+                />
+              </View>
+            </>
+            ) : queueModel === "mmc" ? (
+                <>
+                <View style={styles.input}>
+                  <Text style={styles.head}>
+                    Lambda (λ) or Mean of Inter Arrival
+                  </Text>
+                  <InputField
+                    label={""}
+                    keyboardType={"numeric"}
+                    onChangeText={(text) => setLambda(text)}
+                  />
+                </View>
+                <View style={styles.input}>
+                  <Text style={styles.head}>Mu (µ) or Mean of Service Time</Text>
+                  <InputField
+                    label={""}
+                    keyboardType={"numeric"}
+                    onChangeText={(text) => setSigmaST(text)}
+                  />
+                </View>
+                
+                <View style={styles.input}>
+                  <Text style={styles.head}>Number of servers (c)</Text>
+                  <InputField
+                    label={""}
+                    keyboardType={"numeric"}
+                    onChangeText={(text) => setServers(text)}
+                  />
+                </View>
+              </>
+            ) :  (
+                <>
+                <View style={styles.input}>
+                  <Text style={styles.head}>
+                    Lambda (λ) or Mean of Inter Arrival
+                  </Text>
+                  <InputField
+                    label={""}
+                    keyboardType={"numeric"}
+                    onChangeText={(text) => setLambda(text)}
+                  />
+                </View>
+                <View style={styles.input}>
+                  <Text style={styles.head}>Mu (µ) or Mean of Service Time</Text>
+                  <InputField
+                    label={""}
+                    keyboardType={"numeric"}
+                    onChangeText={(text) => setMu(text)}
+                  />
+                </View>
+                <View style={styles.input}>
+                  <Text style={styles.head}>Sigma (σ2) or Variance of Service Time</Text>
+                  <InputField
+                    label={""}
+                    keyboardType={"numeric"}
+                    onChangeText={(text) => setSigmaST(text)}
+                  />
+                </View>
+                <View style={styles.input}>
+                  <Text style={styles.head}>Number of servers (c)</Text>
+                  <InputField
+                    label={""}
+                    keyboardType={"numeric"}
+                    onChangeText={(text) => setServers(text)}
+                  />
+                </View>
+              </>
+            ) 
           )}
         </View>
         <View style={styles.bottomButton}>
