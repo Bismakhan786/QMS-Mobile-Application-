@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { arrivalTimeSim, mainSimmulation } from "../../backend";
 import CustomButton from "../../components/Button/CustomButton";
 import InputField from "../../components/Fields/InputField";
 import Header from "../../components/Header/Header";
@@ -8,8 +9,17 @@ const EnterParameters = (props) => {
   const [lambda, setLambda] = useState(0);
   const [mu, setMu] = useState(0);
 
+  console.log("ENter parameters")
+  // add minutes on input
+  console.log(lambda, mu)
+
   const handleSubmit = () => {
     console.log(lambda, mu);
+    const IaSt = mainSimmulation(2, Number(lambda), Number(mu))
+    const interArrival = IaSt[0]
+    const serviceTime = IaSt[1]
+    const arrivalTime = arrivalTimeSim(interArrival)
+    console.log("Arrival", arrivalTime, "Inter Arrival", interArrival, "Service", serviceTime)
   };
   return (
     <ScrollView style={styles.container}>

@@ -4,6 +4,8 @@ import BottomTabNavigation from "./BottomTabNavigation";
 import EnterData from "../screens/Simulation/EnterData";
 import EnterParameters from "../screens/Simulation/EnterParameters";
 import PMEP from "../screens/PerformanceMeasures/PMEP";
+import SimulationResult from "../screens/Simulation/SimulationResult";
+import PerformanceResult from "../screens/PerformanceMeasures/PerformanceResult";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +30,16 @@ const MyStack = () => {
       <Stack.Screen
         name="PMEP"
         component={PMEP}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SimulationResult"
+        component={SimulationResult}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PerformanceResult"
+        component={PerformanceResult}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

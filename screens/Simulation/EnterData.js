@@ -1,22 +1,72 @@
 import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  ScrollView,
-} from "react-native";
+  avgTime,
+  avgUtilizationRate,
+  avgWaitingTimeWhoWait,
+  interArrivalCalculation,
+  startEndArrCalculation,
+  timeCalculation,
+} from "../../backend";
 import CustomButton from "../../components/Button/CustomButton";
 import Header from "../../components/Header/Header";
 
 const EnterData = (props) => {
+  const [arr, setArr] = useState(0);
+  const [service, setService] = useState(0);
 
-    const [arr, setArr] = useState(0);
-    const [service, setService] = useState(0);
+  const handleSubmit = () => {
+    console.log(arr, service);
+    const arrivalTime = arr.split("\n").map((x) => Number(x));
+    const serviceTime = service.split("\n").map((x) => Number(x));
+    const interArrival = interArrivalCalculation(arrivalTime);
+    const startEnd = startEndArrCalculation(arrivalTime, serviceTime);
+    const turnAroundTimeArr = timeCalculation(startEnd[1], arrivalTime);
+    const waitTimeArr = timeCalculation(turnAroundTimeArr, serviceTime);
+    const responseTimeArr = timeCalculation(startEnd[0], arrivalTime);
+    const avgServiceTime = avgTime(serviceTime);
+    const avgTurnAroundTime = avgTime(turnAroundTimeArr);
+    const avgWaitingTime = avgTime(waitTimeArr);
+    const avgInterArrivalTime = avgTime(interArrival);
+    const avgResponseTime = avgTime(responseTimeArr);
+    const waitTimeWhoWaitArr = avgWaitingTimeWhoWait(waitTimeArr);
+    const utilicationRate = avgUtilizationRate(startEnd[2], startEnd[3], startEnd[1][startEnd[1].length - 1])
 
-    const handleSubmit = () => {
-        console.log(arr, service)
-    }
+    console.log(
+      "arrival: ",
+      arrivalTime,
+      "service: ",
+      serviceTime,
+      "interArrival",
+      interArrival,
+      "Start",
+      startEnd[0],
+      "End",
+      startEnd[1],
+      "Wait",
+      waitTimeArr,
+      "Response",
+      responseTimeArr,
+      "Turnaround",
+      turnAroundTimeArr,
+      "avgInterarrival",
+      avgInterArrivalTime,
+      "avgWait",
+      avgWaitingTime,
+      "avgResponse",
+      avgResponseTime,
+      "avgTurnaround",
+      avgTurnAroundTime,
+      "avgService",
+      avgServiceTime,
+      "wait time who wait",
+      waitTimeWhoWaitArr,
+      "utilization rate",
+      utilicationRate
+    );
+
+    props.navigation.navigate("SimulationResult", {arrivalTime, serviceTime})
+  };
   return (
     <ScrollView style={styles.container}>
       <Header label={"Enter Data"} showLabel={true} />
@@ -36,8 +86,8 @@ const EnterData = (props) => {
                 marginBottom: 16,
                 fontWeight: "600",
                 fontSize: 14,
-            }}
-            onChangeText={(text) => setArr(text)}
+              }}
+              onChangeText={(text) => setArr(text)}
             />
           </View>
           <View style={{ width: "49%" }}>
@@ -48,13 +98,13 @@ const EnterData = (props) => {
                 multiline
                 numberOfLines={20}
                 style={{
-                    padding: 10,
-                    textAlign: "center",
-                    borderColor: "#ccc",
-                    borderWidth: 1,
-                    marginBottom: 16,
-                    fontWeight: "600",
-                    fontSize: 14,
+                  padding: 10,
+                  textAlign: "center",
+                  borderColor: "#ccc",
+                  borderWidth: 1,
+                  marginBottom: 16,
+                  fontWeight: "600",
+                  fontSize: 14,
                 }}
                 onChangeText={(text) => setService(text)}
               />
@@ -62,9 +112,22 @@ const EnterData = (props) => {
           </View>
         </View>
         <View style={styles.bottomButton}>
-          <CustomButton label={"Simulate"} width={"100%"} onPressFunction={handleSubmit}/>
+          <CustomButton
+            label={"Simulate"}
+            width={"100%"}
+            onPressFunction={handleSubmit}
+          />
         </View>
-      <Text style={{color: 'red', marginTop: 10, textAlign: 'center', fontWeight: 'bold'}}>All the values should be integer</Text>
+        <Text
+          style={{
+            color: "red",
+            marginTop: 10,
+            textAlign: "center",
+            fontWeight: "bold",
+          }}
+        >
+          All the values should be integer
+        </Text>
       </View>
     </ScrollView>
   );

@@ -40,21 +40,23 @@ const PerformanceMeasures = (props) => {
                   label={<Text style={styles.radBtnTxt}>M/M/1</Text>}
                 />
                 <RadioButtonItem
-                  value="mmc"
-                  label={<Text style={styles.radBtnTxt}>M/M/C</Text>}
-                />
-                <RadioButtonItem
                   value="mg1"
                   label={<Text style={styles.radBtnTxt}>M/G/1</Text>}
-                />
-                <RadioButtonItem
-                  value="mgc"
-                  label={<Text style={styles.radBtnTxt}>M/G/C</Text>}
                 />
                 <RadioButtonItem
                   value="gg1"
                   label={<Text style={styles.radBtnTxt}>G/G/1</Text>}
                 />
+                <RadioButtonItem
+                  value="mmc"
+                  label={<Text style={styles.radBtnTxt}>M/M/C</Text>}
+                />
+                
+                <RadioButtonItem
+                  value="ggc"
+                  label={<Text style={styles.radBtnTxt}>G/G/C</Text>}
+                />
+                
                 
               </RadioButtonGroup>
             </View>
