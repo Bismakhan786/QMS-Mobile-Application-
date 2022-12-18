@@ -171,25 +171,25 @@ console.log("Avg Utilization rate = ",avgUtilizationRate(startTimeIdle,endTimeId
 
 //================================ SIMMULATION ========================================
 
-function factorial(n){
-    //base case
-    if(n == 0 || n == 1){
-        return 1;
-    //recursive case
-    }else{
-        return n * factorial(n-1);
-    }
-}
+// function factorial(n){
+//     //base case
+//     if(n == 0 || n == 1){
+//         return 1;
+//     //recursive case
+//     }else{
+//         return n * factorial(n-1);
+//     }
+// }
 
 
-function cummulativeProb(x,lmbda, mu){
-    let e = 2.718281828
-    let result = 0
-    for(let i=0 ; i<=x ; i++){
-        result += (Math.pow(e,-lmbda)*Math.pow(lmbda,i))/ factorial(i)
-    }
-    return result.toFixed(4)
-}
+// function cummulativeProb(x,lmbda, mu){
+//     let e = 2.718281828
+//     let result = 0
+//     for(let i=0 ; i<=x ; i++){
+//         result += (Math.pow(e,-lmbda)*Math.pow(lmbda,i))/ factorial(i)
+//     }
+//     return result.toFixed(4)
+// }
 
 
 
