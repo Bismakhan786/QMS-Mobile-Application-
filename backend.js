@@ -234,218 +234,131 @@ function arrivalTimeSim(interarrivalArr){
 
 //-----------------------------------RATE PARAMETER MODELS-----------------------------------
 
-//-------------------------------------M/M/1--------------------------------------------
-class M_M_1 {
-  constructor(lambda, mu) {
-    this.lambda = lambda;
-    this.mu = mu;
-    this.utilization = lambda / mu;
-  }
-  get_Utilization() {
-    return this.utilization;
-  }
-  number_of_customer_in_queue() {
-    return Math.pow(this.utilization, 2) / (1 - this.utilization);
-  }
-  wait_in_queue() {
-    return this.number_of_customer_in_queue() / this.lambda;
-  }
-  wait_in_system() {
-    return this.wait_in_queue() + 1 / this.mu;
-  }
-  number_of_customer_in_system() {
-    return this.lambda * this.wait_in_system();
-  }
-  proportion_of_idletime() {
-    return 1 - this.utilization;
-  }
-}
-//-------------------------------------M/G/1--------------------------------------------
-class M_G_1 {
-  constructor(lambda, mu, variance) {
-    this.lambda = lambda;
-    this.mu = mu;
-    this.variance = variance;
-    this.utilization = lambda / mu;
-  }
-
-  get_Utilization() {
-    return this.utilization;
-  }
-  number_of_customer_in_queue() {
-    return (
-      (Math.pow(this.lambda, 2) * Math.pow(this.variance, 2) +
-        Math.pow(this.utilization, 2)) /
-      (2 * (1 - this.utilization))
-    );
-  }
-  wait_in_queue() {
-    return this.number_of_customer_in_queue() / this.lambda;
-  }
-  wait_in_system() {
-    return this.wait_in_queue() + 1 / this.mu;
-  }
-  number_of_customer_in_system() {
-    return this.lambda * this.wait_in_system();
-  }
-  proportion_of_idletime() {
-    return 1 - this.utilization;
-  }
-}
-//-------------------------------------G/G/1--------------------------------------------
-class G_G_1 {
-  constructor(lambda, mu, varianceA, varianceS) {
-    this.lambda = lambda;
-    this.mu = mu;
-    this.varianceA = varianceA;
-    this.varianceS = varianceS;
-    this.utilization = lambda / mu;
-  }
-  cSquare(variance, mean) {
-    return variance / Math.pow(mean, 2);
-  }
-  get_Utilization() {
-    return this.utilization;
-  }
-  number_of_customer_in_queue() {
-    var utilizationSquare = Math.pow(this.utilization, 2);
-    var CaSquare = this.cSquare(this.varianceA, 1 / this.lambda);
-    var CsSquare = this.cSquare(this.varianceS, 1 / this.mu);
-    return (
-      (utilizationSquare *
-        (1 + CsSquare) *
-        (CaSquare + utilizationSquare * CsSquare)) /
-      (2 * (1 - this.utilization) * (1 + utilizationSquare * CsSquare))
-    );
-  }
-  wait_in_queue() {
-    return this.number_of_customer_in_queue() / this.lambda;
-  }
-  wait_in_system() {
-    return this.wait_in_queue() + 1 / this.mu;
-  }
-  number_of_customer_in_system() {
-    return this.lambda * this.wait_in_system();
-  }
-  proportion_of_idletime() {
-    return 1 - this.utilization;
-  }
-}
-//-------------------------------------M/M/C--------------------------------------------
-class M_M_C {
-  constructor(lambda, mu, varianceA, varianceS, C) {
-    this.lambda = lambda;
-    this.mu = mu;
-    this.varianceA = varianceA;
-    this.varianceS = varianceS;
-    this.C = C;
-    this.utilization = lambda / (mu * C);
-  }
-  cSquare(variance, mean) {
-    return variance / Math.pow(mean, 2);
-  }
-  factorial(num) {
-    if (num == 0 || num == 1) {
-      return 1;
-    }
-    var f = num;
-    while (num > 1) {
-      num--;
-      f *= num;
-    }
-    return f;
-  }
-  get_Utilization() {
-    return this.utilization;
-  }
-  number_of_customer_in_queue() {
-    var factor = 0;
-    for (let i = 0; i < this.C; i++) {
-      factor += Math.pow(this.C * this.utilization, i) / this.factorial(i);
-    }
-    factor +=
-      Math.pow(this.C * this.utilization, this.C) /
-      (this.factorial(this.C) * (1 - this.utilization));
-    var Po = 1 / factor;
-    return (
-      (Po * Math.pow(this.lambda / this.mu, this.C) * this.utilization) /
-      (this.factorial(this.C) * Math.pow(1 - this.utilization, 2))
-    );
-  }
-  wait_in_queue() {
-    return this.number_of_customer_in_queue() / this.lambda;
-  }
-  wait_in_system() {
-    return this.wait_in_queue() + 1 / this.mu;
-  }
-  number_of_customer_in_system() {
-    return this.lambda * this.wait_in_system();
-  }
-  proportion_of_idletime() {
-    return 1 - this.utilization;
-  }
-}
-//-------------------------------------G/G/C--------------------------------------------
-class G_G_C {
-  constructor(lambda, mu, varianceA, varianceS, C) {
-    this.lambda = lambda;
-    this.mu = mu;
-    this.varianceA = varianceA;
-    this.varianceS = varianceS;
-    this.C = C;
-    this.utilization = lambda / (mu * C);
-  }
-  cSquare(variance, mean) {
-    return variance / Math.pow(mean, 2);
-  }
-  get_Utilization() {
-    return this.utilization;
-  }
-  number_of_customer_in_queue() {
-    return this.wait_in_queue() * this.lambda;
-  }
-  wait_in_queue() {
-    var CaSquare = this.cSquare(this.varianceA, 1 / this.lambda);
-    var CsSquare = this.cSquare(this.varianceS, 1 / this.mu);
-    var mmcWq = new M_M_C(
-      this.lambda,
-      this.mu,
-      this.varianceA,
-      this.varianceS,
-      this.C
-    );
-    return mmcWq.wait_in_queue() * ((CaSquare + CsSquare) / 2);
-  }
-  wait_in_system() {
-    return this.wait_in_queue() + 1 / this.mu;
-  }
-  number_of_customer_in_system() {
-    return this.lambda * this.wait_in_system();
-  }
-  proportion_of_idletime() {
-    return 1 - this.utilization;
-  }
-}
-
+//-------------------------------some used functions----------------------------------
 function variance(max, min) {
   return ((max - min) ^ 2) / 12;
 }
+function cSquare(variance, mean) {
+  return variance / Math.pow(mean, 2);
+}
+function factorial(num) {
+  if (num == 0 || num == 1) {
+    return 1;
+  }
+  var f = num;
+  while (num > 1) {
+    num--;
+    f *= num;
+  }
+  return f;
+}
+//-------------------------------------M/M/1--------------------------------------------
+function MM1(lambda, mu) {
+  var rate_parameter = {};
+  rate_parameter["utilization"] = lambda / mu;
+  rate_parameter["number_of_customer_in_queue"] =
+    Math.pow(rate_parameter["utilization"], 2) /
+    (1 - rate_parameter["utilization"]);
+  rate_parameter["wait_in_queue"] =
+    rate_parameter["number_of_customer_in_queue"] / lambda;
+  rate_parameter["wait_in_system"] = rate_parameter["wait_in_queue"] + 1 / mu;
+  rate_parameter["number_of_customer_in_system"] =
+    lambda * rate_parameter["wait_in_system"];
+  rate_parameter["proportion_of_idletime"] = 1 - rate_parameter["utilization"];
+  return rate_parameter;
+}
 
-// var obj = new M_M_1(0.1, 0.125);
-// var obj = new M_G_1(0.1, 0.125, variance(9, 7));
-// var obj = new G_G_1(0.1, 0.125, 20, 25);
-// var obj = new M_M_C(0.1, 0.0667, 100, 8.333, 2);
-var obj = new G_G_C(0.1, 0.0667, 100, 8.333, 2);
-console.log("utilization: " + obj.get_Utilization());
-console.log("proportion_of_idletime: " + obj.proportion_of_idletime());
-console.log(
-  "number_of_customer_in_system: " + obj.number_of_customer_in_system()
-);
-console.log("wait_in_system: " + obj.wait_in_system());
-console.log("wait_in_queue: " + obj.wait_in_queue());
-console.log(
-  "number_of_customer_in_queue: " + obj.number_of_customer_in_queue()
-);
+// console.log(MM1(0.1, 0.125));
+
+//-------------------------------------M/G/1--------------------------------------------
+function MG1(lambda, mu, variance) {
+  var rate_parameter = {};
+  rate_parameter["utilization"] = lambda / mu;
+  rate_parameter["number_of_customer_in_queue"] =
+    (Math.pow(lambda, 2) * Math.pow(variance, 2) +
+      Math.pow(rate_parameter["utilization"], 2)) /
+    (2 * (1 - rate_parameter["utilization"]));
+  rate_parameter["wait_in_queue"] =
+    rate_parameter["number_of_customer_in_queue"] / lambda;
+  rate_parameter["wait_in_system"] = rate_parameter["wait_in_queue"] + 1 / mu;
+  rate_parameter["number_of_customer_in_system"] =
+    lambda * rate_parameter["wait_in_system"];
+  rate_parameter["proportion_of_idletime"] = 1 - rate_parameter["utilization"];
+  return rate_parameter;
+}
+
+// console.log(MG1(0.1, 0.125, variance(9, 7)));
+
+//-------------------------------------G/G/1--------------------------------------------
+function GG1(lambda, mu, varianceA, varianceS) {
+  var rate_parameter = {};
+  rate_parameter["utilization"] = lambda / mu;
+  let utilizationSquare = Math.pow(rate_parameter["utilization"], 2);
+  let CaSquare = cSquare(varianceA, 1 / lambda);
+  let CsSquare = cSquare(varianceS, 1 / mu);
+  rate_parameter["number_of_customer_in_queue"] =
+    (utilizationSquare *
+      (1 + CsSquare) *
+      (CaSquare + utilizationSquare * CsSquare)) /
+    (2 *
+      (1 - rate_parameter["utilization"]) *
+      (1 + utilizationSquare * CsSquare));
+  rate_parameter["wait_in_queue"] =
+    rate_parameter["number_of_customer_in_queue"] / lambda;
+  rate_parameter["wait_in_system"] = rate_parameter["wait_in_queue"] + 1 / mu;
+  rate_parameter["number_of_customer_in_system"] =
+    lambda * rate_parameter["wait_in_system"];
+  rate_parameter["proportion_of_idletime"] = 1 - rate_parameter["utilization"];
+  return rate_parameter;
+}
+
+// console.log(GG1(0.1, 0.125, 20, 25));
+
+//-------------------------------------M/M/C--------------------------------------------
+function MMC(lambda, mu, varianceA, varianceS, C) {
+  var rate_parameter = {};
+  rate_parameter["utilization"] = lambda / (mu * C);
+  var factor = 0;
+  for (let i = 0; i < C; i++) {
+    factor += Math.pow(C * rate_parameter["utilization"], i) / factorial(i);
+  }
+  factor +=
+    Math.pow(C * rate_parameter["utilization"], C) /
+    (factorial(C) * (1 - rate_parameter["utilization"]));
+  var Po = 1 / factor;
+  rate_parameter["number_of_customer_in_queue"] =
+    (Po * Math.pow(lambda / mu, C) * rate_parameter["utilization"]) /
+    (factorial(C) * Math.pow(1 - rate_parameter["utilization"], 2));
+  rate_parameter["wait_in_queue"] =
+    rate_parameter["number_of_customer_in_queue"] / lambda;
+  rate_parameter["wait_in_system"] = rate_parameter["wait_in_queue"] + 1 / mu;
+  rate_parameter["number_of_customer_in_system"] =
+    lambda * rate_parameter["wait_in_system"];
+  rate_parameter["proportion_of_idletime"] = 1 - rate_parameter["utilization"];
+  return rate_parameter;
+}
+
+// console.log(MMC(0.1, 0.0667, 100, 8.333, 2));
+
+//-------------------------------------G/G/C--------------------------------------------
+function GGC(lambda, mu, varianceA, varianceS, C) {
+  var rate_parameter = {};
+  rate_parameter["utilization"] = lambda / (mu * C);
+  let CaSquare = cSquare(varianceA, 1 / lambda);
+  let CsSquare = cSquare(varianceS, 1 / mu);
+  let mmcWq = MMC(lambda, mu, varianceA, varianceS, C);
+  rate_parameter["wait_in_queue"] =
+    mmcWq.wait_in_queue * ((CaSquare + CsSquare) / 2);
+  rate_parameter["number_of_customer_in_queue"] =
+    rate_parameter["wait_in_queue"] * lambda;
+  rate_parameter["wait_in_system"] = rate_parameter["wait_in_queue"] + 1 / mu;
+  rate_parameter["number_of_customer_in_system"] =
+    lambda * rate_parameter["wait_in_system"];
+  rate_parameter["proportion_of_idletime"] = 1 - rate_parameter["utilization"];
+  return rate_parameter;
+}
+
+// console.log(GGC(0.1, 0.0667, 100, 8.333, 2));
 
 //----------------------------------EXCEL FILE LOAD-----------------------------------------------
 function handleFile(e) {
