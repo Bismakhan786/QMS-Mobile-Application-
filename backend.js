@@ -168,27 +168,8 @@ function main() {
 
 //================================ SIMMULATION ========================================
 
-// function factorial(n){
-//     //base case
-//     if(n == 0 || n == 1){
-//         return 1;
-//     //recursive case
-//     }else{
-//         return n * factorial(n-1);
-//     }
-// }
-
-// function cummulativeProb(x,lmbda, mu){
-//     let e = 2.718281828
-//     let result = 0
-//     for(let i=0 ; i<=x ; i++){
-//         result += (Math.pow(e,-lmbda)*Math.pow(lmbda,i))/ factorial(i)
-//     }
-//     return result.toFixed(4)
-// }
-
 function TimeSimmulation(mu) {
-  return (-mu * Math.log(Math.random(0, 1))).toFixed(0);
+  return (-mu * Math.log(1 - Math.random()));
 }
 
 function mainSimmulation(mins, lambda, mu) {
@@ -224,6 +205,35 @@ function arrivalTimeSim(interarrivalArr) {
     }
   }
   return arrivalArr;
+}
+
+function TimeSimulation(mu_lambda) {
+  return Math.round(-Math.log(1 - Math.random()) * mu_lambda);
+}
+
+function Simulation(mins, lambda, mu) {
+  
+  let clock = 0;
+  let serviceTimeArray = [];
+  let interArrivalTimeArray = [];
+  let arrivalTimeArray = [];
+  let clockArray = []
+
+while (clock <= mins){
+    clockArray.push(clock)
+    let arrival_t = 0;
+    let interarrival_t = TimeSimulation(lambda);
+    
+    arrivalTimeArray.length > 0 ? arrival_t = arrivalTimeArray[arrivalTimeArray.length - 1] + interarrival_t :arrival_t = clock + interarrival_t;
+    let service_t = TimeSimulation(mu);
+    
+    interArrivalTimeArray.push(interarrival_t)
+    arrivalTimeArray.push(arrival_t);
+    serviceTimeArray.push(service_t);
+    
+    clock += Math.min(interarrival_t, service_t)
+}
+  return [interArrivalTimeArray, serviceTimeArray, arrivalTimeArray, clockArray];
 }
 
 //-----------------------------------RATE PARAMETER MODELS-----------------------------------
@@ -364,5 +374,7 @@ export {
     MG1,
     GG1,
     MMC,
-    GGC
+    GGC,
+    TimeSimulation,
+    Simulation,
 }

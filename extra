@@ -1,0 +1,40 @@
+function TimeSimulation(mu_lambda) {
+  return Math.round(-Math.log(1 - Math.random()) * mu_lambda);
+}
+
+function Simulation(mins, lambda, mu) {
+  
+  let clock = 0;
+  let serviceTimeArray = [];
+  let interArrivalTimeArray = [];
+  let arrivalTimeArray = [];
+  let clockArray = []
+
+while (clock <= mins){
+    clockArray.push(clock)
+    let arrival_t = 0;
+    let interarrival_t = TimeSimulation(lambda);
+    
+    arrivalTimeArray.length > 0 ? arrival_t = arrivalTimeArray[arrivalTimeArray.length - 1] + interarrival_t :arrival_t = clock + interarrival_t;
+    let service_t = TimeSimulation(mu);
+    
+    interArrivalTimeArray.push(interarrival_t)
+    arrivalTimeArray.push(arrival_t);
+    serviceTimeArray.push(service_t);
+    
+    clock += Math.min(interarrival_t, service_t)
+}
+  return [interArrivalTimeArray, serviceTimeArray, arrivalTimeArray, clockArray];
+}
+
+const itas = Simulation(240, 1.8, 2)
+const ita = itas[0]
+const st = itas[1]
+const at = itas[2]
+const clock = itas[3]
+
+console.log("interarrival time ", ita);
+console.log("arrival time ", at);
+console.log("service time ", st);
+console.log("clock ", clock);
+console.log("last index", clock[clock.length - 1])

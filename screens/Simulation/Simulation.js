@@ -11,7 +11,8 @@ const Simulation = (props) => {
   const [simHours, setSimHours] = useState(1);
 
   const handleSubmit = () => {
-    currentDataFormat === "rd" ? props.navigation.navigate("EnterData") : props.navigation.navigate("EnterParams");
+    const simTime = simHours * 60;
+    currentDataFormat === "rd" ? props.navigation.navigate("EnterData", {simTime}) : props.navigation.navigate("EnterParams", {simTime});
     console.log(simHours)
   }
 

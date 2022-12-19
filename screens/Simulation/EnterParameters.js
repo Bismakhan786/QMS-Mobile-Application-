@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { arrivalTimeSim, mainSimmulation } from "../../backend";
+import { TimeSimulation, Simulation } from "../../backend";
 import CustomButton from "../../components/Button/CustomButton";
 import InputField from "../../components/Fields/InputField";
 import Header from "../../components/Header/Header";
@@ -8,18 +8,29 @@ import Header from "../../components/Header/Header";
 const EnterParameters = (props) => {
   const [lambda, setLambda] = useState(0);
   const [mu, setMu] = useState(0);
+  const {simTime} = props.route.params;
 
-  console.log("ENter parameters")
+  // console.log("Enter parameters");
   // add minutes on input
-  console.log(lambda, mu)
+  // console.log(lambda, mu);
 
   const handleSubmit = () => {
-    console.log(lambda, mu);
-    const IaSt = mainSimmulation(2, Number(lambda), Number(mu))
-    const interArrival = IaSt[0]
-    const serviceTime = IaSt[1]
-    const arrivalTime = arrivalTimeSim(interArrival)
-    console.log("Arrival", arrivalTime, "Inter Arrival", interArrival, "Service", serviceTime)
+    // console.log(lambda, mu);
+
+    console.log(simTime)
+    const itas = Simulation(simTime, lambda, mu);
+    const ita = itas[0];
+    const serviceTime = itas[1];
+    const arrivalTime = itas[2];
+    const clock = itas[3];
+
+    console.log("interarrival time ", ita);
+    console.log("arrival time ", arrivalTime);
+    console.log("service time ", serviceTime);
+    console.log("clock ", clock);
+    console.log("last index", clock[clock.length - 1]);
+
+    props.navigation.navigate("SimulationResult", {arrivalTime, serviceTime, simTime})
   };
   return (
     <ScrollView style={styles.container}>

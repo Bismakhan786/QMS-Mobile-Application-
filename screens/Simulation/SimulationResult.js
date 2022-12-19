@@ -10,10 +10,10 @@ import {
   timeCalculation,
 } from "../../backend";
 import PMcard from "../../components/Cards/PMcard";
+import windowHeight from "../../utils/Dimension";
 
 const SimulationResult = (props) => {
-  const arrivalTime = props.route.params.arrivalTime;
-  const serviceTime = props.route.params.serviceTime;
+  const {arrivalTime, serviceTime, simTime} = props.route.params;
   const interArrival = interArrivalCalculation(arrivalTime);
   const startEnd = startEndArrCalculation(arrivalTime, serviceTime);
   const turnAroundTimeArr = timeCalculation(startEnd[1], arrivalTime);
@@ -42,13 +42,41 @@ const SimulationResult = (props) => {
   ];
 
   const dataCards = [
-    { id: 1, data: avgServiceTime.toFixed(2) + " min", label: "Avg Service Time" },
-    { id: 2, data: avgTurnAroundTime.toFixed(2) + " min", label: "Avg Turnaround Time" },
-    { id: 3, data: avgWaitingTime.toFixed(2) + " min", label: "Avg Waiting Time" },
-    { id: 4, data: avgResponseTime.toFixed(2) + " min", label: "Avg Response Time" },
-    { id: 5, data: avgInterArrivalTime.toFixed(2) + " min", label: "Avg Inter Arrival Time" },
-    { id: 6, data: waitTimeWhoWaitArr.toFixed(2) + " min", label: "Wait Time of those who wait" },
-    { id: 7, data: utilicationRate.toFixed(2) + " %", label: "Utilization Rate" },
+    {
+      id: 1,
+      data: avgServiceTime.toFixed(2) + " min",
+      label: "Avg Service Time",
+    },
+    {
+      id: 2,
+      data: avgTurnAroundTime.toFixed(2) + " min",
+      label: "Avg Turnaround Time",
+    },
+    {
+      id: 3,
+      data: avgWaitingTime.toFixed(2) + " min",
+      label: "Avg Waiting Time",
+    },
+    {
+      id: 4,
+      data: avgResponseTime.toFixed(2) + " min",
+      label: "Avg Response Time",
+    },
+    {
+      id: 5,
+      data: avgInterArrivalTime.toFixed(2) + " min",
+      label: "Avg Inter Arrival Time",
+    },
+    {
+      id: 6,
+      data: waitTimeWhoWaitArr.toFixed(2) + " min",
+      label: "Wait Time of those who wait",
+    },
+    {
+      id: 7,
+      data: utilicationRate.toFixed(2) + " %",
+      label: "Utilization Rate",
+    },
   ];
 
   return (
@@ -61,8 +89,10 @@ const SimulationResult = (props) => {
           borderWidth: 1,
           borderRadius: 10,
           borderColor: "#ccc",
+          height: "40%",
         }}
       >
+        <Text style={{fontWeight: 'bold', marginLeft: 16}}>Simulation Time <Text style={{color: '#843b62', fontWeight: 'bold'}}>{simTime}</Text> mins</Text>
         <FlatList
           data={dataTable}
           renderItem={({ item, index }) => (
@@ -108,20 +138,22 @@ const SimulationResult = (props) => {
           }}
         />
       </View>
-      <FlatList
+      <View
+      style={{
+        marginHorizontal: 16,
+        paddingVertical: 16,
+        height: "49%",
+        paddingBottom: 16
+      }}
+      >
+        <FlatList
           data={dataCards}
-          renderItem={({ item, index }) => (
-            <PMcard item={item} key={index}/>
-          )}
+          renderItem={({ item, index }) => <PMcard item={item} key={index} />}
           numColumns={1}
           contentContainerStyle={{
             paddingBottom: 16,
-              marginHorizontal: 16,
-            marginTop: 8,
           }}
         />
-      <View style={{ marginHorizontal: 16 }}>
-        
       </View>
     </SafeAreaView>
   );
@@ -131,7 +163,7 @@ export default SimulationResult;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: windowHeight,
     backgroundColor: "white",
   },
 });
