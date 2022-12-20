@@ -239,7 +239,7 @@ while (clock <= mins){
 //-----------------------------------RATE PARAMETER MODELS-----------------------------------
 //-------------------------------some used functions----------------------------------
 function variance(max, min) {
-  return ((max - min) ^ 2) / 12;
+  return Math.pow((max - min),2) / 12;
 }
 function cSquare(variance, mean) {
   return variance / Math.pow(mean, 2);
