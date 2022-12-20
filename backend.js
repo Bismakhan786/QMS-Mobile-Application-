@@ -474,5 +474,4 @@ function strtEnd_M_M_C(arrivalArr,serviceTimeArr,c){
         }
     }
     return data
-    // return [server,start,end]
 }
