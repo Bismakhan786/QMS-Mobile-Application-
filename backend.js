@@ -183,7 +183,7 @@ function mainSimmulation(mins, lambda, mu) {
     gen_val = TimeSimmulation(lambda);
     result = Number(result) + Number(gen_val);
     InterArrivalTimeSim.push(Number(gen_val));
-    if (result == mins) {
+    if (result >= mins) {
       console.log(result);
       break;
     }
@@ -239,7 +239,7 @@ while (clock <= mins){
 //-----------------------------------RATE PARAMETER MODELS-----------------------------------
 //-------------------------------some used functions----------------------------------
 function variance(max, min) {
-  return ((max - min) ^ 2) / 12;
+  return Math.pow((max - min),2) / 12;
 }
 function cSquare(variance, mean) {
   return variance / Math.pow(mean, 2);
@@ -377,4 +377,101 @@ export {
     GGC,
     TimeSimulation,
     Simulation,
+}
+
+
+
+//========================================== M/M/C Simmulation =====================================================
+
+
+function strtEnd_M_M_C(arrivalArr,serviceTimeArr,c){
+    //start and end data array
+    let data = []
+    //servers array
+    var s = Array(c).fill(0);
+    // console.log(s)
+
+    start=[]
+    end=[]
+    server=[]
+
+    for(let i=0;i<serviceTimeArr.length;i++){
+        if(i==0){
+            data.push([i,arrivalArr[i],arrivalArr[i]+serviceTimeArr[i]])
+            start.push(arrivalArr[i])
+            end.push(arrivalArr[i]+serviceTimeArr[i])
+            s[i]=1
+            server.push(i)
+        }
+        else{
+            if(s.indexOf(0)!==-1){
+                let ind = s.indexOf(0)
+                data.push([ind,arrivalArr[i],arrivalArr[i]+serviceTimeArr[i]])
+
+                start.push(arrivalArr[i])
+                end.push(arrivalArr[i]+serviceTimeArr[i])
+                server.push(ind)
+
+                s[ind]=1
+            }
+            else{
+                //find last indexes of all servers
+                let last_ind = []
+                server.reverse()
+                arr_len = server.length-1
+                let val =0
+                for(let j = 0;j<s.length;j++){
+                    val =j
+                    if(server.indexOf(val)==0){
+                        last_ind.push(server.indexOf(val)+(server.length-1))
+                    }
+                    else if(server.indexOf(val)==(server.length-1)){
+                        last_ind.push(0)
+                    }
+                    else{
+                        last_ind.push(arr_len-server.indexOf(val))
+                    // last_ind.push(server.indexOf(val))
+                    }
+                }
+                server.reverse()
+
+                //find end values of servers and minimum among them
+                let end_min_arr = []
+                let min_end = 0
+                for(let m = 0;m<last_ind.length;m++){
+                    end_min_arr.push(end[last_ind[m]])
+                }
+                //minimum end value
+                min_end = Math.min(...end_min_arr)
+
+                if(end_min_arr.every(e => arrivalArr[i] < e)){
+                    server.push(server[end_min_arr.indexOf(min_end)])
+                    start.push(min_end)
+                    end.push(min_end+serviceTimeArr[i])
+                
+                   data.push([
+                        server[end_min_arr.indexOf(min_end)],
+                        min_end,
+                        min_end+serviceTimeArr[i]
+                    ])
+                }
+                else{
+                    if(arrivalArr[i]>min_end){
+                        server.push(server[end_min_arr.indexOf(min_end)])
+                        start.push(arrivalArr[i])
+                        end.push(arrivalArr[i]+serviceTimeArr[i])
+
+                        data.push([
+                            server[end_min_arr.indexOf(min_end)],
+                            arrivalArr[i],
+                            arrivalArr[i]+serviceTimeArr[i]
+                        ])
+                    }
+                }
+                
+
+            }
+        }
+    }
+    return data
 }
