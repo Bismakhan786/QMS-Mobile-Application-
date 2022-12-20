@@ -183,7 +183,7 @@ function mainSimmulation(mins, lambda, mu) {
     gen_val = TimeSimmulation(lambda);
     result = Number(result) + Number(gen_val);
     InterArrivalTimeSim.push(Number(gen_val));
-    if (result == mins) {
+    if (result >= mins) {
       console.log(result);
       break;
     }
