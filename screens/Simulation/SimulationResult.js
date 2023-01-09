@@ -6,42 +6,69 @@ import {
   avgUtilizationRate,
   avgWaitingTimeWhoWait,
   interArrivalCalculation,
+  proportion_of_idletime_MMC,
   startEndArrCalculation,
+  strtEnd_M_M_C,
   timeCalculation,
+  utilizationRateMMC,
 } from "../../backend";
 import PMcard from "../../components/Cards/PMcard";
 import windowHeight from "../../utils/Dimension";
 
 const SimulationResult = (props) => {
-  const {arrivalTime, serviceTime, simTime} = props.route.params;
+  const { arrivalTime, serviceTime, simTime, currentQueueModel, servers } =
+    props.route.params;
   const interArrival = interArrivalCalculation(arrivalTime);
-  const startEnd = startEndArrCalculation(arrivalTime, serviceTime);
-  const turnAroundTimeArr = timeCalculation(startEnd[1], arrivalTime);
+  const startEndMM1 = startEndArrCalculation(arrivalTime, serviceTime);
+  const startEndMMC = strtEnd_M_M_C(arrivalTime, serviceTime, servers);
+  tEnd_M_M_C(arrivalTime, serviceTime, servers);
+  
+  const turnAroundTimeArr = timeCalculation( currentQueueModel === "mm1" ? startEndMM1[1] : startEndMMC[2], arrivalTime);
   const waitTimeArr = timeCalculation(turnAroundTimeArr, serviceTime);
-  const responseTimeArr = timeCalculation(startEnd[0], arrivalTime);
+  const responseTimeArr = timeCalculation(currentQueueModel === "mm1" ? startEndMM1[0] : startEndMMC[1], arrivalTime);
+  
+  
   const avgServiceTime = avgTime(serviceTime);
   const avgTurnAroundTime = avgTime(turnAroundTimeArr);
   const avgWaitingTime = avgTime(waitTimeArr);
   const avgInterArrivalTime = avgTime(interArrival);
   const avgResponseTime = avgTime(responseTimeArr);
   const waitTimeWhoWaitArr = avgWaitingTimeWhoWait(waitTimeArr);
-  const utilicationRate = avgUtilizationRate(
-    startEnd[2],
-    startEnd[3],
-    startEnd[1][startEnd[1].length - 1]
-  );
-  const dataTable = [
+  const utilizationRate =
+  currentQueueModel === "mm1"
+    ?  avgUtilizationRate(
+        startEndMM1[2],
+        startEndMM1[3],
+        startEndMM1[1][startEndMM1[1].length - 1]
+      )
+    : null;
+
+    console.log("Utilization rate array: ", utilizationRateMMC(startEndMMC[0], serviceTime, servers))
+ 
+  let dataTable = 
+  currentQueueModel === "mm1"
+    ? ([
+        { id: 1, data: arrivalTime, label: "Arrival" },
+        { id: 2, data: serviceTime, label: "Service" },
+        { id: 3, data: interArrival, label: "Inter Arrival" },
+        { id: 4, data: startEndMM1[0], label: "Start Time" },
+        { id: 5, data: startEndMM1[1], label: "End Time" },
+        { id: 6, data: waitTimeArr, label: "Wait Time" },
+        { id: 7, data: responseTimeArr, label: "Response Time" },
+        { id: 8, data: turnAroundTimeArr, label: "Turnaround Time" },
+      ])
+    : ([
     { id: 1, data: arrivalTime, label: "Arrival" },
     { id: 2, data: serviceTime, label: "Service" },
     { id: 3, data: interArrival, label: "Inter Arrival" },
-    { id: 4, data: startEnd[0], label: "Start Time" },
-    { id: 5, data: startEnd[1], label: "End Time" },
-    { id: 6, data: waitTimeArr, label: "Wait Time" },
-    { id: 7, data: responseTimeArr, label: "Response Time" },
-    { id: 8, data: turnAroundTimeArr, label: "Turnaround Time" },
+        { id: 5, data: startEndMMC[1], label: "Start Time" },
+        { id: 6, data: startEndMMC[2], label: "End Time" },
+    { id: 7, data: waitTimeArr, label: "Wait Time" },
+    { id: 8, data: responseTimeArr, label: "Response Time" },
+    { id: 9, data: turnAroundTimeArr, label: "Turnaround Time" },
   ];
 
-  const dataCards = [
+  const dataCards = currentQueueModel === "mm1" ? [
     {
       id: 1,
       data: avgServiceTime.toFixed(2) + " min",
@@ -76,7 +103,39 @@ const SimulationResult = (props) => {
       id: 7,
       data: utilicationRate.toFixed(2) + " %",
       label: "Utilization Rate",
+    }
+] : [
+    {
+      id: 1,
+      data: avgServiceTime.toFixed(2) + " min",
+      label: "Avg Service Time",
     },
+    {
+      id: 2,
+      data: avgTurnAroundTime.toFixed(2) + " min",
+      label: "Avg Turnaround Time",
+    },
+    {
+      id: 3,
+      data: avgWaitingTime.toFixed(2) + " min",
+      label: "Avg Waiting Time",
+    },
+    {
+      id: 4,
+      data: avgResponseTime.toFixed(2) + " min",
+      label: "Avg Response Time",
+    },
+    {
+      id: 5,
+      data: avgInterArrivalTime.toFixed(2) + " min",
+      label: "Avg Inter Arrival Time",
+    },
+    {
+      id: 6,
+      data: waitTimeWhoWaitArr.toFixed(2) + " min",
+      label: "Wait Time of those who wait",
+    },
+      
   ];
 
   return (
@@ -92,8 +151,14 @@ const SimulationResult = (props) => {
           height: "40%",
         }}
       >
-        <Text style={{fontWeight: 'bold', marginLeft: 16}}>Simulation Time <Text style={{color: '#843b62', fontWeight: 'bold'}}>{simTime}</Text> mins</Text>
-        <FlatList
+      <Text style={{ fontWeight: "bold", marginLeft: 16 }}>
+          Simulation Time{" "}
+          <Text style={{ color: "#843b62", fontWeight: "bold" }}>
+            {simTime}
+          </Text>{" "}
+          mins
+      </Text>
+      <FlatList
           data={dataTable}
           renderItem={({ item, index }) => (
             <FlatList
@@ -101,7 +166,7 @@ const SimulationResult = (props) => {
               key={index}
               renderItem={({ item, index }) => (
                 <Text style={{ textAlign: "center", fontWeight: "bold" }}>
-                  {item}
+                  {item.toFixed(0)}
                 </Text>
               )}
               numColumns={1}
@@ -142,8 +207,8 @@ const SimulationResult = (props) => {
       style={{
         marginHorizontal: 16,
         paddingVertical: 16,
-        height: "49%",
-        paddingBottom: 16
+        height: "48%",
+        paddingBottom: 16,
       }}
       >
         <FlatList
