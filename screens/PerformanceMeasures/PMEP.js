@@ -4,6 +4,7 @@ import { GG1, GGC, MG1, MM1, MMC } from "../../backend";
 import CustomButton from "../../components/Button/CustomButton";
 import InputField from "../../components/Fields/InputField";
 import Header from "../../components/Header/Header";
+import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
 
 const PMEP = (props) => {
   const [lambda, setLambda] = useState(0);
@@ -11,6 +12,7 @@ const PMEP = (props) => {
   const [sigmaST, setSigmaST] = useState(0);
   const [sigmaIA, setSigmaIA] = useState(0);
   const [servers, setServers] = useState(1);
+  const [dist, setDist] = useState("u");
 
   const queueModel = props.route.params;
 
@@ -83,9 +85,126 @@ const PMEP = (props) => {
                   onChangeText={(text) => setSigmaST(text)}
                 />
               </View>
+              <View style={styles.input}>
+                <Text style={[styles.head, { marginBottom: 16 }]}>
+                  Select Service Time Distribution
+                </Text>
+
+                <RadioButtonGroup
+                  containerStyle={{ marginBottom: 10 }}
+                  selected={dist}
+                  onSelected={(value) => setDist(value)}
+                  containerOptionStyle={{
+                    marginVertical: 4,
+                    alignItems: "center",
+                    backgroundColor: "whitesmoke",
+                    paddingVertical: 12,
+                    paddingHorizontal: 30,
+                  }}
+                  radioBackground="#843b62"
+                  radioStyle={{ width: 20, height: 20, marginRight: 8 }}
+                >
+                  <RadioButtonItem
+                    value="u"
+                    label={
+                      <Text style={styles.radBtnTxt}>Uniform Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="g"
+                    label={
+                      <Text style={styles.radBtnTxt}>Gamma Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="n"
+                    label={
+                      <Text style={styles.radBtnTxt}>Normal Distribution</Text>
+                    }
+                  />
+                </RadioButtonGroup>
+              </View>
             </>
           ) : queueModel === "gg1" ? (
             <>
+            <View style={styles.input}>
+                <Text style={[styles.head, { marginBottom: 16 }]}>
+                  Select Interarrival Time Distribution
+                </Text>
+
+                <RadioButtonGroup
+                  containerStyle={{ marginBottom: 10 }}
+                  selected={dist}
+                  onSelected={(value) => setDist(value)}
+                  containerOptionStyle={{
+                    marginVertical: 4,
+                    alignItems: "center",
+                    backgroundColor: "whitesmoke",
+                    paddingVertical: 12,
+                    paddingHorizontal: 30,
+                  }}
+                  radioBackground="#843b62"
+                  radioStyle={{ width: 20, height: 20, marginRight: 8 }}
+                >
+                  <RadioButtonItem
+                    value="u"
+                    label={
+                      <Text style={styles.radBtnTxt}>Uniform Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="g"
+                    label={
+                      <Text style={styles.radBtnTxt}>Gamma Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="n"
+                    label={
+                      <Text style={styles.radBtnTxt}>Normal Distribution</Text>
+                    }
+                  />
+                </RadioButtonGroup>
+              </View>
+              <View style={styles.input}>
+                <Text style={[styles.head, { marginBottom: 16 }]}>
+                  Select Service Time Distribution
+                </Text>
+
+                <RadioButtonGroup
+                  containerStyle={{ marginBottom: 10 }}
+                  selected={dist}
+                  onSelected={(value) => setDist(value)}
+                  containerOptionStyle={{
+                    marginVertical: 4,
+                    alignItems: "center",
+                    backgroundColor: "whitesmoke",
+                    paddingVertical: 12,
+                    paddingHorizontal: 30,
+                  }}
+                  radioBackground="#843b62"
+                  radioStyle={{ width: 20, height: 20, marginRight: 8 }}
+                >
+                  <RadioButtonItem
+                    value="u"
+                    label={
+                      <Text style={styles.radBtnTxt}>Uniform Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="g"
+                    label={
+                      <Text style={styles.radBtnTxt}>Gamma Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="n"
+                    label={
+                      <Text style={styles.radBtnTxt}>Normal Distribution</Text>
+                    }
+                  />
+                </RadioButtonGroup>
+              </View>
               <View style={styles.input}>
                 <Text style={styles.head}>
                   Lambda (λ) or Mean of Inter Arrival
@@ -124,6 +243,7 @@ const PMEP = (props) => {
                   onChangeText={(text) => setSigmaST(text)}
                 />
               </View>
+              
             </>
           ) : queueModel === "mmc" ? (
             <>
@@ -176,6 +296,84 @@ const PMEP = (props) => {
             </>
           ) : (
             <>
+            <View style={styles.input}>
+                <Text style={[styles.head, { marginBottom: 16 }]}>
+                  Select Interarrival Time Distribution
+                </Text>
+
+                <RadioButtonGroup
+                  containerStyle={{ marginBottom: 10 }}
+                  selected={dist}
+                  onSelected={(value) => setDist(value)}
+                  containerOptionStyle={{
+                    marginVertical: 4,
+                    alignItems: "center",
+                    backgroundColor: "whitesmoke",
+                    paddingVertical: 12,
+                    paddingHorizontal: 30,
+                  }}
+                  radioBackground="#843b62"
+                  radioStyle={{ width: 20, height: 20, marginRight: 8 }}
+                >
+                  <RadioButtonItem
+                    value="u"
+                    label={
+                      <Text style={styles.radBtnTxt}>Uniform Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="g"
+                    label={
+                      <Text style={styles.radBtnTxt}>Gamma Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="n"
+                    label={
+                      <Text style={styles.radBtnTxt}>Normal Distribution</Text>
+                    }
+                  />
+                </RadioButtonGroup>
+              </View>
+              <View style={styles.input}>
+                <Text style={[styles.head, { marginBottom: 16 }]}>
+                  Select Service Time Distribution
+                </Text>
+
+                <RadioButtonGroup
+                  containerStyle={{ marginBottom: 10 }}
+                  selected={dist}
+                  onSelected={(value) => setDist(value)}
+                  containerOptionStyle={{
+                    marginVertical: 4,
+                    alignItems: "center",
+                    backgroundColor: "whitesmoke",
+                    paddingVertical: 12,
+                    paddingHorizontal: 30,
+                  }}
+                  radioBackground="#843b62"
+                  radioStyle={{ width: 20, height: 20, marginRight: 8 }}
+                >
+                  <RadioButtonItem
+                    value="u"
+                    label={
+                      <Text style={styles.radBtnTxt}>Uniform Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="g"
+                    label={
+                      <Text style={styles.radBtnTxt}>Gamma Distribution</Text>
+                    }
+                  />
+                  <RadioButtonItem
+                    value="n"
+                    label={
+                      <Text style={styles.radBtnTxt}>Normal Distribution</Text>
+                    }
+                  />
+                </RadioButtonGroup>
+              </View>
               <View style={styles.input}>
                 <Text style={styles.head}>
                   Lambda (λ) or Mean of Inter Arrival
