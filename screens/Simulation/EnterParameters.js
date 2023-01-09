@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { TimeSimulation, Simulation } from "../../backend";
+import { TimeSimulation, Simulation, arrivalTimeSim } from "../../backend";
 import CustomButton from "../../components/Button/CustomButton";
 import InputField from "../../components/Fields/InputField";
 import Header from "../../components/Header/Header";
@@ -21,14 +21,15 @@ const EnterParameters = (props) => {
     const itas = Simulation(simTime, lambda, mu);
     const ita = itas[0];
     const serviceTime = itas[1];
-    const arrivalTime = itas[2];
-    const clock = itas[3];
+    // const arrivalTime = itas[2];
+    const arrivalTime = arrivalTimeSim(ita)
+    // const clock = itas[3];
 
-    console.log("interarrival time ", ita);
-    console.log("arrival time ", arrivalTime);
-    console.log("service time ", serviceTime);
-    console.log("clock ", clock);
-    console.log("last index", clock[clock.length - 1]);
+    // console.log("interarrival time ", ita);
+    // console.log("arrival time ", arrivalTime);
+    // console.log("service time ", serviceTime);
+    // console.log("clock ", clock);
+    // console.log("last index", clock[clock.length - 1]);
 
     props.navigation.navigate("SimulationResult", {arrivalTime, serviceTime, simTime})
   };

@@ -15,7 +15,22 @@ function interArrivalCalculation(arrivalArr) {
 function timeCalculation(arr1, arr2) {
   let resultantTimeArr = [];
   for (let i = 0; i < arr1.length; i++) {
-    resultantTimeArr.push(arr1[i] - arr2[i]);
+
+  // let val = arr1[i] - arr2[i]
+  // let add_val =0 
+  // let len = 0
+  // for (let i=0;i<arr.length;i++){
+  //   if((arr1[i] - arr2[i])>mins){
+  //     break
+  //   }
+  //   else{
+  //     val += arr[i]
+  //     len = i
+  //   }
+  // }
+  // return add_val/len 
+
+    resultantTimeArr.push(Math.abs(arr1[i] - arr2[i]));
   }
   return resultantTimeArr;
 }
@@ -80,6 +95,18 @@ function startEndArrCalculation(arrivalArr, serviceTimeArr) {
 
 //Avg InterArrival,Waiting,Service,TurnAround Time Calculation
 function avgTime(arr) {
+  // let add_val = 0 
+  // let len = 0
+  // for (let i=0;i<arr.length;i++){
+  //   if(arr[i]>mins){
+  //     break
+  //   }
+  //   else{
+  //     add_val += arr[i]
+  //     len = i
+  //   }
+  // }
+  // return add_val/len
   return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
@@ -168,11 +195,11 @@ function main() {
 
 //================================ SIMMULATION ========================================
 
-function TimeSimmulation(mu) {
+function TimeSimulation(mu) {
   return (-mu * Math.log(1 - Math.random()));
 }
 
-function mainSimmulation(mins, lambda, mu) {
+function Simulation(mins, lambda, mu) {
   var result = 0;
   let serviceTimeSim = [];
   let InterArrivalTimeSim = [0];
@@ -180,18 +207,20 @@ function mainSimmulation(mins, lambda, mu) {
 
   //for interArrival time
   for (let i = 0; i > -1; i++) {
-    gen_val = TimeSimmulation(lambda);
+    gen_val = TimeSimulation(lambda);
     result = Number(result) + Number(gen_val);
-    InterArrivalTimeSim.push(Number(gen_val));
-    if (result == mins) {
+    if (result >= mins) {
       console.log(result);
       break;
+    }
+    else{
+      InterArrivalTimeSim.push(Number(gen_val));
     }
   }
 
   //for service time
   for (let i = 0; i < InterArrivalTimeSim.length; i++) {
-    gen_val = TimeSimmulation(mu);
+    gen_val = TimeSimulation(mu);
     serviceTimeSim.push(Number(gen_val));
   }
   return [InterArrivalTimeSim, serviceTimeSim];
@@ -207,39 +236,39 @@ function arrivalTimeSim(interarrivalArr) {
   return arrivalArr;
 }
 
-function TimeSimulation(mu_lambda) {
-  return Math.round(-Math.log(1 - Math.random()) * mu_lambda);
-}
+// function TimeSimulation(mu_lambda) {
+//   return Math.round(-Math.log(1 - Math.random()) * mu_lambda);
+// }
 
-function Simulation(mins, lambda, mu) {
+// function Simulation(mins, lambda, mu) {
   
-  let clock = 0;
-  let serviceTimeArray = [];
-  let interArrivalTimeArray = [];
-  let arrivalTimeArray = [];
-  let clockArray = []
+//   let clock = 0;
+//   let serviceTimeArray = [];
+//   let interArrivalTimeArray = [];
+//   let arrivalTimeArray = [];
+//   let clockArray = []
 
-while (clock <= mins){
-    clockArray.push(clock)
-    let arrival_t = 0;
-    let interarrival_t = TimeSimulation(lambda);
+// while (clock <= mins){
+//     clockArray.push(clock)
+//     let arrival_t = 0;
+//     let interarrival_t = TimeSimulation(lambda);
     
-    arrivalTimeArray.length > 0 ? arrival_t = arrivalTimeArray[arrivalTimeArray.length - 1] + interarrival_t :arrival_t = clock + interarrival_t;
-    let service_t = TimeSimulation(mu);
+//     arrivalTimeArray.length > 0 ? arrival_t = arrivalTimeArray[arrivalTimeArray.length - 1] + interarrival_t :arrival_t = clock + interarrival_t;
+//     let service_t = TimeSimulation(mu);
     
-    interArrivalTimeArray.push(interarrival_t)
-    arrivalTimeArray.push(arrival_t);
-    serviceTimeArray.push(service_t);
+//     interArrivalTimeArray.push(interarrival_t)
+//     arrivalTimeArray.push(arrival_t);
+//     serviceTimeArray.push(service_t);
     
-    clock += Math.min(interarrival_t, service_t)
-}
-  return [interArrivalTimeArray, serviceTimeArray, arrivalTimeArray, clockArray];
-}
+//     clock += Math.min(interarrival_t, service_t)
+// }
+//   return [interArrivalTimeArray, serviceTimeArray, arrivalTimeArray, clockArray];
+// }
 
 //-----------------------------------RATE PARAMETER MODELS-----------------------------------
 //-------------------------------some used functions----------------------------------
 function variance(max, min) {
-  return ((max - min) ^ 2) / 12;
+  return Math.pow((max - min),2) / 12;
 }
 function cSquare(variance, mean) {
   return variance / Math.pow(mean, 2);
@@ -361,6 +390,130 @@ function GGC(lambda, mu, varianceA, varianceS, C) {
 
 // console.log(GGC(0.1, 0.0667, 100, 8.333, 2));
 
+//========================================== M/M/C Simmulation =====================================================
+
+
+function strtEnd_M_M_C(arrivalArr,serviceTimeArr,c){
+  //start and end data array
+  let data = []
+  //servers array
+  var s = Array(c).fill(0);
+  // console.log(s)
+
+  let start=[]
+  let end=[]
+  let server=[]
+
+  for(let i=0;i<serviceTimeArr.length;i++){
+      if(i==0){
+          data.push([i,arrivalArr[i],arrivalArr[i]+serviceTimeArr[i]])
+          start.push(arrivalArr[i])
+          end.push(arrivalArr[i]+serviceTimeArr[i])
+          s[i]=1
+          server.push(i)
+      }
+      else{
+          if(s.indexOf(0)!==-1){
+              let ind = s.indexOf(0)
+              data.push([ind,arrivalArr[i],arrivalArr[i]+serviceTimeArr[i]])
+
+              start.push(arrivalArr[i])
+              end.push(arrivalArr[i]+serviceTimeArr[i])
+              server.push(ind)
+
+              s[ind]=1
+          }
+          else{
+              //find last indexes of all servers
+              let last_ind = []
+              server.reverse()
+              let arr_len = server.length-1
+              let val =0
+              for(let j = 0;j<s.length;j++){
+                  val =j
+                  if(server.indexOf(val)==0){
+                      last_ind.push(server.indexOf(val)+(server.length-1))
+                  }
+                  else if(server.indexOf(val)==(server.length-1)){
+                      last_ind.push(0)
+                  }
+                  else{
+                      last_ind.push(arr_len-server.indexOf(val))
+                  // last_ind.push(server.indexOf(val))
+                  }
+              }
+              server.reverse()
+
+              //find end values of servers and minimum among them
+              let end_min_arr = []
+              let min_end = 0
+              for(let m = 0;m<last_ind.length;m++){
+                  end_min_arr.push(end[last_ind[m]])
+              }
+              //minimum end value
+              min_end = Math.min(...end_min_arr)
+
+              if(end_min_arr.every(e => arrivalArr[i] < e)){
+                  server.push(server[end_min_arr.indexOf(min_end)])
+                  start.push(min_end)
+                  end.push(min_end+serviceTimeArr[i])
+
+                 data.push([
+                      server[end_min_arr.indexOf(min_end)],
+                      min_end,
+                      min_end+serviceTimeArr[i]
+                  ])
+              }
+              else{
+                  if(arrivalArr[i]>min_end){
+                      server.push(server[end_min_arr.indexOf(min_end)])
+                      start.push(arrivalArr[i])
+                      end.push(arrivalArr[i]+serviceTimeArr[i])
+
+                      data.push([
+                          server[end_min_arr.indexOf(min_end)],
+                          arrivalArr[i],
+                          arrivalArr[i]+serviceTimeArr[i]
+                      ])
+                  }
+              }
+
+
+          }
+      }
+  }
+  return [server, start, end]
+}
+
+function utilizationRateMMC(server, serviceArray, C) {
+  console.log("in function")
+  let utilizationArray = [];
+  let val = 0;
+  let totalServiceTime = serviceArray.reduce((a, b) => a + b, 0)
+  for(let i = 0; i < C; i++){
+    console.log("in for loop")
+    val = 0;
+    for(let j=0; j<serviceArray.length; j++){
+      if(server[j] === i){
+        val += serviceArray[j]
+      }
+    }
+    console.log("Value in fun: ", val)
+    val = val/totalServiceTime;
+    utilizationArray.push((val * 100).toFixed(2));
+  }
+  return utilizationArray
+}
+
+function proportion_of_idletime_MMC(utilizationArray){
+  let idleTime = [];
+  for(let i=0; i<utilizationArray.length; i++){
+    idleTime.push(1-utilizationArray[i])
+  }
+  return idleTime
+}
+
+
 export {
     interArrivalCalculation,
     timeCalculation,
@@ -368,8 +521,8 @@ export {
     avgTime,
     avgWaitingTimeWhoWait,
     avgUtilizationRate,
-    mainSimmulation,
-    arrivalTimeSim,
+    // mainSimmulation,
+    // arrivalTimeSim,
     MM1,
     MG1,
     GG1,
@@ -377,4 +530,8 @@ export {
     GGC,
     TimeSimulation,
     Simulation,
+    arrivalTimeSim,
+    strtEnd_M_M_C,
+    utilizationRateMMC,
+    proportion_of_idletime_MMC
 }

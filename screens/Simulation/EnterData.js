@@ -7,15 +7,18 @@ import {
   interArrivalCalculation,
   startEndArrCalculation,
   timeCalculation,
-  Simulation
+  Simulation,
+  arrivalTimeSim,
 } from "../../backend";
 import CustomButton from "../../components/Button/CustomButton";
+import InputField from "../../components/Fields/InputField";
 import Header from "../../components/Header/Header";
 
 const EnterData = (props) => {
   const [arr, setArr] = useState(0);
   const [service, setService] = useState(0);
-  const {simTime} = props.route.params
+  const { simTime, currentQueueModel } = props.route.params;
+  const [servers, setServers] = useState(2);
 
   const handleSubmit = () => {
     console.log(arr, service);
@@ -70,9 +73,16 @@ const EnterData = (props) => {
     const itas = Simulation(simTime, avgInterArrivalTime, avgServiceTime);
     const ita = itas[0];
     const serviceTime = itas[1];
-    const arrivalTime = itas[2];
-    const clock = itas[3];
-    props.navigation.navigate("SimulationResult", {arrivalTime, serviceTime, simTime})
+    // const arrivalTime = itas[2];
+    const arrivalTime = arrivalTimeSim(ita)
+    // const clock = itas[3];
+    props.navigation.navigate("SimulationResult", {
+      arrivalTime,
+      serviceTime,
+      simTime,
+      currentQueueModel,
+      servers
+    });
   };
   return (
     <ScrollView style={styles.container}>
@@ -118,6 +128,31 @@ const EnterData = (props) => {
             </ScrollView>
           </View>
         </View>
+        {currentQueueModel === "mmc" && (
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 6,
+              marginHorizontal: 16,
+              justifyContent: "space-between",
+            }}
+          >
+            <Text
+              style={{ marginRight: 16, fontWeight: "bold", color: "#666" }}
+            >
+              Number of servers
+            </Text>
+            <InputField
+              label={"2"}
+              keyboardType={"numeric"}
+              width={"60%"}
+              onChangeText={(text) => setServers(text)}
+            />
+          </View>
+        )}
         <View style={styles.bottomButton}>
           <CustomButton
             label={"Simulate"}
