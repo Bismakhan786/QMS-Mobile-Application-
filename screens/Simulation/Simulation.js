@@ -12,7 +12,7 @@ const Simulation = (props) => {
 
   const handleSubmit = () => {
     const simTime = simHours * 60;
-    currentDataFormat === "rd" ? props.navigation.navigate("EnterData", {simTime}) : props.navigation.navigate("EnterParams", {simTime});
+    currentDataFormat === "rd" ? props.navigation.navigate("EnterData", {simTime, currentQueueModel}) : props.navigation.navigate("EnterParams", {simTime});
     console.log(simHours)
   }
 
@@ -72,8 +72,8 @@ const Simulation = (props) => {
                 label={<Text style={styles.radBtnTxt}>M/M/1</Text>}
               />
               <RadioButtonItem
-                value="mm2"
-                label={<Text style={styles.radBtnTxt}>M/M/2</Text>}
+                value="mmc"
+                label={<Text style={styles.radBtnTxt}>M/M/C</Text>}
               />
             </RadioButtonGroup>
           </View>
